@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administer - Vendas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="flex-between mt-2 mb-2">
+            <h1 data-i18n="sales_title">Registrar Venda</h1>
+        </header>
+
+        <div class="card">
+            <form id="sales-form">
+                <div class="input-group">
+                    <label class="input-label" data-i18n="lbl_select_product">Produto</label>
+                    <select id="s-product" required>
+                        <!-- Injected -->
+                    </select>
+                </div>
+
+                <div class="flex-between gap-1">
+                    <div class="input-group" style="flex:1;">
+                        <label class="input-label" data-i18n="lbl_quantity">Qtd</label>
+                        <input type="number" id="s-qty" value="1" min="1" required>
+                    </div>
+                    <div class="input-group" style="flex:1;">
+                        <label class="input-label" data-i18n="lbl_payment_method">Pagamento</label>
+                        <select id="s-method">
+                            <option value="Pix" data-i18n="opt_pix">Pix</option>
+                            <option value="Dinheiro" data-i18n="opt_cash">Dinheiro</option>
+                            <option value="Cartão" data-i18n="opt_card">Cartão</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex-between mb-2">
+                    <span class="text-muted">Total:</span>
+                    <strong style="font-size: 1.5rem;" class="text-success" id="s-total">R$ 0,00</strong>
+                </div>
+
+                <button type="submit" class="btn" data-i18n="btn_confirm_sale">Confirmar Venda</button>
+            </form>
+        </div>
+
+        <h2 class="mt-2" data-i18n="sales_history_title">Histórico do Dia</h2>
+        <div id="sales-history">
+            <!-- List Items -->
+        </div>
+
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/vendas.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administer - Configurações</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="flex-between mt-2 mb-2">
+            <h1 data-i18n="settings_title">Configurações</h1>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label class="input-label" data-i18n="lbl_language">Idioma</label>
+                <select id="langSelect">
+                    <option value="pt-BR">🇧🇷 Português</option>
+                    <option value="en-US">🇺🇸 English</option>
+                </select>
+            </div>
+
+            <hr style="border:0; border-top:1px solid var(--glass-border); margin: 20px 0;">
+
+            <h3 class="mb-2" data-i18n="lbl_profile">Perfil</h3>
+            <div class="input-group">
+                <label class="input-label" data-i18n="lbl_name">Nome</label>
+                <input type="text" id="profileName" placeholder="Nome do Usuário/Loja">
+            </div>
+            <button class="btn" id="btnSaveProfile" data-i18n="btn_save_profile">Salvar Perfil</button>
+            <p id="msgProfile" class="text-success mt-1 text-center" style="display:none;"
+                data-i18n="msg_profile_saved">Salvo!</p>
+
+            <hr style="border:0; border-top:1px solid var(--glass-border); margin: 20px 0;">
+
+            <h3 class="mb-2" data-i18n="lbl_security">Segurança</h3>
+            <div class="input-group">
+                <label class="input-label" data-i18n="lbl_current_pass">Senha Atual</label>
+                <input type="password" id="currentPass">
+            </div>
+            <div class="input-group">
+                <label class="input-label" data-i18n="lbl_new_pass">Nova Senha</label>
+                <input type="password" id="newPass">
+            </div>
+            <div class="input-group">
+                <label class="input-label" data-i18n="lbl_confirm_pass">Confirmar Nova Senha</label>
+                <input type="password" id="confirmPass">
+            </div>
+            <button class="btn" id="btnChangePass" data-i18n="btn_change_pass">Alterar Senha</button>
+            <p id="msgPass" class="text-center mt-1" style="display:none;"></p>
+
+            <button class="btn btn-danger mt-2" id="btnLogout" data-i18n="btn_logout">Sair</button>
+        </div>
+
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await i18n.init();
+
+            const langSelect = document.getElementById('langSelect');
+            langSelect.value = i18n.currentLang;
+
+            langSelect.addEventListener('change', (e) => {
+                i18n.setLanguage(e.target.value);
+            });
+
+            // Profile Logic
+            const profileNameInput = document.getElementById('profileName');
+            profileNameInput.value = AppStorage.getUserName();
+
+            document.getElementById('btnSaveProfile').addEventListener('click', () => {
+                const name = profileNameInput.value.trim();
+                if (name) {
+                    AppStorage.setUserName(name);
+                    const msg = document.getElementById('msgProfile');
+                    msg.style.display = 'block';
+                    setTimeout(() => msg.style.display = 'none', 3000);
+                }
+            });
+
+            // Password Logic
+            document.getElementById('btnChangePass').addEventListener('click', () => {
+                const current = document.getElementById('currentPass').value;
+                const newP = document.getElementById('newPass').value;
+                const confirmP = document.getElementById('confirmPass').value;
+                const msg = document.getElementById('msgPass');
+
+                const stored = AppStorage.getPassword();
+
+                if (current !== stored) {
+                    msg.textContent = i18n.t('msg_pass_error'); // "Erro: Verifique as senhas."
+                    msg.className = 'text-center mt-1 text-danger';
+                    msg.style.display = 'block';
+                    return;
+                }
+
+                if (newP !== confirmP || !newP) {
+                    msg.textContent = i18n.t('msg_pass_error');
+                    msg.className = 'text-center mt-1 text-danger';
+                    msg.style.display = 'block';
+                    return;
+                }
+
+                AppStorage.setPassword(newP);
+                msg.textContent = i18n.t('msg_pass_changed');
+                msg.className = 'text-center mt-1 text-success';
+                msg.style.display = 'block';
+
+                // Clear fields
+                document.getElementById('currentPass').value = '';
+                document.getElementById('newPass').value = '';
+                document.getElementById('confirmPass').value = '';
+            });
+
+            document.getElementById('btnLogout').addEventListener('click', () => {
+                Auth.logout();
+            });
+        });
+    </script>
+</body>
+
+</html>

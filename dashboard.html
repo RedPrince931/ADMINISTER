@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administer - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="flex-between mt-2 mb-2">
+            <h1 data-i18n="dashboard_title">Painel Principal</h1>
+            <div class="logo-area" style="width: 40px; height: 40px;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                    <path
+                        d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z" />
+                </svg>
+            </div>
+        </header>
+
+        <!-- Stock Alert Widget -->
+        <div id="stock-alert-widget" class="card" style="display:none; border-color: var(--danger);">
+            <h3 data-i18n="alert_stock_title" style="color: var(--danger); font-size: 1rem;">⚠️ Alerta de Estoque</h3>
+            <div class="flex-between mt-1">
+                <span class="text-muted" data-i18n="alert_low_stock">Estoque Baixo</span>
+                <strong id="count-low" style="color: yellow;">0</strong>
+            </div>
+            <div class="flex-between mt-1">
+                <span class="text-muted" data-i18n="alert_out_stock">Sem Estoque</span>
+                <strong id="count-empty" class="text-danger">0</strong>
+            </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+            <div class="card kpi-card">
+                <span class="kpi-label" data-i18n="kpi_products">Produtos</span>
+                <span class="kpi-value" id="kpi-products">0</span>
+            </div>
+
+            <div class="card kpi-card">
+                <span class="kpi-label" data-i18n="kpi_sales_today">Vendas Hoje</span>
+                <span class="kpi-value text-success" id="kpi-sales-today">R$ 0,00</span>
+            </div>
+
+            <div class="card kpi-card">
+                <span class="kpi-label" data-i18n="kpi_sales_month">Vendas Mês</span>
+                <span class="kpi-value text-success" id="kpi-sales-month">R$ 0,00</span>
+            </div>
+
+            <div class="card kpi-card">
+                <span class="kpi-label" data-i18n="kpi_profit">Lucro Est.</span>
+                <span class="kpi-value" id="kpi-profit">R$ 0,00</span>
+                <div id="profit-status" class="text-center text-muted mt-1" style="font-size: 0.8rem;"></div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-bar">
+            <a href="estoque.html" class="btn clickable">
+                <span data-i18n="btn_add_product">Novo Produto</span>
+            </a>
+            <a href="vendas.html" class="btn clickable" style="background: var(--success);">
+                <span data-i18n="btn_new_sale">Nova Venda</span>
+            </a>
+        </div>
+
+        <!-- Recent Sales -->
+        <h2 data-i18n="recent_sales_title">Últimas Vendas</h2>
+        <div class="card">
+            <ul class="recent-list" id="recent-sales-list">
+                <!-- Injected via JS -->
+            </ul>
+        </div>
+
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

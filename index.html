@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administer - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body class="login-screen">
+
+    <div class="logo-area">
+        <svg viewBox="0 0 24 24">
+            <path
+                d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z" />
+        </svg>
+    </div>
+
+    <h1 data-i18n="login_title">Bem-vindo</h1>
+    <p class="text-muted mb-2" data-i18n="login_subtitle">Entre com suas credenciais</p>
+
+    <div class="card" style="width: 100%; max-width: 350px;">
+        <div class="input-group">
+            <select id="langSelect">
+                <option value="pt-BR">🇧🇷 Português</option>
+                <option value="en-US">🇺🇸 English</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label" data-i18n="login_name_label">Nome do usuário</label>
+            <input type="text" id="username" data-i18n="login_name_placeholder" placeholder="Nome">
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="password" data-i18n="password_placeholder" placeholder="Senha">
+        </div>
+
+        <button class="btn" id="btnLogin" data-i18n="login_button">Entrar</button>
+        <button class="btn btn-secondary mt-1" id="btnToggleRegister" data-i18n="create_account">Criar conta</button>
+        <p id="errorMsg" class="text-danger mt-1 text-center" style="display: none;" data-i18n="login_error">Senha
+            incorreta</p>
+        <p id="successMsg" class="text-success mt-1 text-center" style="display: none;" data-i18n="msg_account_created">
+            Conta criada!</p>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await i18n.init();
+            Auth.checkAuth();
+
+            // Language Switcher
+            const langSelect = document.getElementById('langSelect');
+            langSelect.value = i18n.currentLang;
+            langSelect.addEventListener('change', (e) => {
+                i18n.setLanguage(e.target.value);
+            });
+
+            // UI Elements
+            const title = document.querySelector('[data-i18n="login_title"]');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnToggle = document.getElementById('btnToggleRegister');
+            const userInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+
+            let isRegisterMode = false;
+
+            // Pre-fill username if exists
+            const savedName = AppStorage.getUserName();
+            if (savedName) userInput.value = savedName;
+
+            // Toggle Mode
+            btnToggle.addEventListener('click', () => {
+                isRegisterMode = !isRegisterMode;
+                if (isRegisterMode) {
+                    title.setAttribute('data-i18n', 'create_account');
+                    title.textContent = i18n.t('create_account');
+
+                    btnLogin.setAttribute('data-i18n', 'btn_create');
+                    btnLogin.textContent = i18n.t('btn_create');
+
+                    btnToggle.textContent = i18n.t('btn_back_login'); // "Voltar para login"
+                    btnToggle.setAttribute('data-i18n', 'btn_back_login');
+
+                    userInput.value = '';
+                    passwordInput.value = '';
+                    errorMsg.style.display = 'none';
+                    successMsg.style.display = 'none';
+                } else {
+                    title.setAttribute('data-i18n', 'login_title');
+                    title.textContent = i18n.t('login_title');
+
+                    btnLogin.setAttribute('data-i18n', 'login_button');
+                    btnLogin.textContent = i18n.t('login_button');
+
+                    btnToggle.setAttribute('data-i18n', 'create_account');
+                    btnToggle.textContent = i18n.t('create_account');
+
+                    if (savedName) userInput.value = savedName;
+                }
+            });
+
+            const handleAction = () => {
+                const name = userInput.value.trim();
+                const pass = passwordInput.value;
+
+                if (!name || !pass) {
+                    alert('Preencha todos os campos');
+                    return;
+                }
+
+                if (isRegisterMode) {
+                    // Register
+                    AppStorage.setUserName(name);
+                    AppStorage.setPassword(pass);
+
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        // Switch back to login
+                        btnToggle.click();
+                        // Auto fill?
+                        userInput.value = name;
+                        // Wait user to login
+                    }, 1500);
+                } else {
+                    // Login
+                    const isValid = Auth.login(pass);
+                    if (isValid) {
+                        // Update name if changed during login? 
+                        // Logic says "Salvar o nome... se ainda não existir" 
+                        // But usually login doesn't update name unless specified.
+                        // Let's ensure name is synced if it matches password? 
+                        // Actually, we trust the password. If password matches, we are good.
+                        // We might want to update the stored name if the user typed a different one but logged in successfully?
+                        // Nah, let's just respect the flow.
+
+                        // If we are logging in, we might want to ensure the typed name is saved if it was empty
+                        AppStorage.setUserName(name);
+
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        errorMsg.style.display = 'block';
+                    }
+                }
+            };
+
+            btnLogin.addEventListener('click', handleAction);
+
+            // Trigger enter key
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleAction();
+            });
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') passwordInput.focus();
+            });
+        });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('SW Registered'))
+                .catch(console.error);
+        }
+    </script>
+</body>
+
+</html>
